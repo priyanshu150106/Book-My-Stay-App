@@ -34,7 +34,7 @@ public class BookMyStayApp {
 
         System.out.println("=================================");
         System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.6 ");
+        System.out.println(" Version: 1.7 ");
         System.out.println("=================================\n");
 
         ArrayList<Room> rooms = new ArrayList<>();
@@ -46,11 +46,12 @@ public class BookMyStayApp {
 
         Scanner sc = new Scanner(System.in);
 
+        int bookingCounter = 1001;
+
         System.out.print("Enter room type to book: ");
         String searchType = sc.nextLine();
 
         boolean found = false;
-        int bookingCounter = 1001;
 
         for (Room room : rooms) {
 
@@ -66,7 +67,7 @@ public class BookMyStayApp {
 
                     room.availableRooms -= requestedRooms;
 
-                    Booking booking = new Booking(bookingCounter, room.type, requestedRooms);
+                    Booking booking = new Booking(bookingCounter++, room.type, requestedRooms);
 
                     double totalCost = requestedRooms * room.price;
 
@@ -100,13 +101,8 @@ public class BookMyStayApp {
 
                     System.out.println("\nBooking Confirmed ✅");
                     System.out.println("Booking ID: " + booking.bookingId);
-                    System.out.println("Room Type: " + booking.roomType);
-                    System.out.println("Rooms Booked: " + booking.roomsBooked);
-                    System.out.println("Services: " + booking.services);
-                    System.out.println("Total Cost: ₹" + booking.totalCost);
                 } else {
                     System.out.println("\nBooking Failed ❌");
-                    System.out.println("Not enough rooms available");
                 }
             }
         }
@@ -114,6 +110,24 @@ public class BookMyStayApp {
         if (!found) {
             System.out.println("\nRoom type not found ❌");
         }
+
+        System.out.println("\n========== BOOKING HISTORY ==========");
+
+        double totalRevenue = 0;
+
+        for (Booking b : bookings) {
+            System.out.println("Booking ID: " + b.bookingId);
+            System.out.println("Room Type: " + b.roomType);
+            System.out.println("Rooms Booked: " + b.roomsBooked);
+            System.out.println("Services: " + b.services);
+            System.out.println("Total Cost: ₹" + b.totalCost);
+            System.out.println("-----------------------------");
+
+            totalRevenue += b.totalCost;
+        }
+
+        System.out.println("Total Bookings: " + bookings.size());
+        System.out.println("Total Revenue: ₹" + totalRevenue);
 
         sc.close();
     }
