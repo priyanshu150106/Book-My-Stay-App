@@ -13,16 +13,29 @@ class Room {
     }
 }
 
+class Booking {
+    int bookingId;
+    String roomType;
+    int roomsBooked;
+
+    Booking(int bookingId, String roomType, int roomsBooked) {
+        this.bookingId = bookingId;
+        this.roomType = roomType;
+        this.roomsBooked = roomsBooked;
+    }
+}
+
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
         System.out.println("=================================");
         System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.4 ");
+        System.out.println(" Version: 1.5 ");
         System.out.println("=================================\n");
 
         ArrayList<Room> rooms = new ArrayList<>();
+        ArrayList<Booking> bookings = new ArrayList<>();
 
         rooms.add(new Room("Single Room", 2000, 5));
         rooms.add(new Room("Double Room", 3500, 3));
@@ -34,24 +47,33 @@ public class BookMyStayApp {
         String searchType = sc.nextLine();
 
         boolean found = false;
+        int bookingCounter = 1001;
 
         for (Room room : rooms) {
 
             if (room.type.equalsIgnoreCase(searchType)) {
                 found = true;
 
-                System.out.println("\nRoom Found!");
-                System.out.println("Available Rooms: " + room.availableRooms);
-
+                System.out.println("\nAvailable Rooms: " + room.availableRooms);
                 System.out.print("Enter number of rooms to book: ");
                 int requestedRooms = sc.nextInt();
 
                 if (requestedRooms <= room.availableRooms) {
+
                     room.availableRooms -= requestedRooms;
 
-                    System.out.println("\nBooking Successful ✅");
-                    System.out.println("Rooms Booked: " + requestedRooms);
-                    System.out.println("Remaining Rooms: " + room.availableRooms);
+                    Booking booking = new Booking(
+                            bookingCounter,
+                            room.type,
+                            requestedRooms
+                    );
+
+                    bookings.add(booking);
+
+                    System.out.println("\nBooking Confirmed ✅");
+                    System.out.println("Booking ID: " + booking.bookingId);
+                    System.out.println("Room Type: " + booking.roomType);
+                    System.out.println("Rooms Booked: " + booking.roomsBooked);
                 } else {
                     System.out.println("\nBooking Failed ❌");
                     System.out.println("Not enough rooms available");
