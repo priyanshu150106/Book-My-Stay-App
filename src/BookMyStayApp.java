@@ -42,91 +42,56 @@ public class BookMyStayApp {
         Scanner sc = new Scanner(System.in);
         int bookingCounter = 1001;
 
-        try {
+        System.out.print("Enter room type to book: ");
+        String searchType = sc.nextLine();
 
-            System.out.print("Enter room type to book: ");
-            String searchType = sc.nextLine();
+        for (Room room : rooms) {
 
-            boolean found = false;
+            if (room.type.equalsIgnoreCase(searchType)) {
 
-            for (Room room : rooms) {
+                System.out.print("Enter number of rooms: ");
+                int requestedRooms = sc.nextInt();
 
-                if (room.type.equalsIgnoreCase(searchType)) {
-                    found = true;
-
-                    System.out.println("Available Rooms: " + room.availableRooms);
-                    System.out.print("Enter number of rooms to book: ");
-
-                    if (!sc.hasNextInt()) {
-                        System.out.println("Invalid input ❌ (Enter numbers only)");
-                        return;
-                    }
-
-                    int requestedRooms = sc.nextInt();
-
-                    if (requestedRooms <= 0) {
-                        System.out.println("Invalid number of rooms ❌");
-                        return;
-                    }
-
-                    if (requestedRooms > room.availableRooms) {
-                        System.out.println("Not enough rooms available ❌");
-                        return;
-                    }
+                if (requestedRooms <= room.availableRooms) {
 
                     room.availableRooms -= requestedRooms;
 
                     Booking booking = new Booking(bookingCounter++, room.type, requestedRooms);
-
-                    double totalCost = requestedRooms * room.price;
-
-                    System.out.println("Select Add-On Service:");
-                    System.out.println("1. WiFi (₹500)");
-                    System.out.println("2. Breakfast (₹800)");
-                    System.out.println("3. Parking (₹300)");
-                    System.out.println("4. None");
-
-                    if (!sc.hasNextInt()) {
-                        System.out.println("Invalid service choice ❌");
-                        return;
-                    }
-
-                    int choice = sc.nextInt();
-
-                    switch (choice) {
-                        case 1:
-                            booking.services.add("WiFi");
-                            totalCost += 500;
-                            break;
-                        case 2:
-                            booking.services.add("Breakfast");
-                            totalCost += 800;
-                            break;
-                        case 3:
-                            booking.services.add("Parking");
-                            totalCost += 300;
-                            break;
-                        case 4:
-                            break;
-                        default:
-                            System.out.println("Invalid choice ❌");
-                            return;
-                    }
-
-                    booking.totalCost = totalCost;
                     bookings.add(booking);
 
                     System.out.println("Booking Confirmed ✅");
                     System.out.println("Booking ID: " + booking.bookingId);
                 }
             }
+        }
 
-            if (!found) {
-                System.out.println("Room type not found ❌");
+        System.out.print("\nEnter Booking ID to cancel: ");
+        int cancelId = sc.nextInt();
+
+        boolean cancelled = false;
+
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking b = bookings.get(i);
+
+            if (b.bookingId == cancelId) {
+
+                for (Room room : rooms) {
+                    if (room.type.equalsIgnoreCase(b.roomType)) {
+                        room.availableRooms += b.roomsBooked;
+                    }
+                }
+
+                bookings.remove(i);
+                cancelled = true;
+
+                System.out.println("Booking Cancelled ✅");
+                break;
             }
+        }
 
-        } catch (Exception e) {
-            System.out.println("Unexpected error occurred ❌");
+        if (!cancelled) {
+            System.out.println("Invalid Booking ID ❌");
         }
 
         sc.close();
