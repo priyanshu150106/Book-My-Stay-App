@@ -1,4 +1,6 @@
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 class Room {
     String type;
@@ -8,60 +10,111 @@ class Room {
         this.type = type;
         this.availableRooms = availableRooms;
     }
-
-    synchronized void bookRoom(String user, int roomsRequested) {
-
-        System.out.println(user + " trying to book " + roomsRequested + " rooms");
-
-        if (roomsRequested <= availableRooms) {
-
-            System.out.println(user + " booking in progress...");
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                System.out.println("Error");
-            }
-
-            availableRooms -= roomsRequested;
-
-            System.out.println(user + " booking successful ✅");
-            System.out.println("Remaining Rooms: " + availableRooms);
-        } else {
-            System.out.println(user + " booking failed ❌ (Not enough rooms)");
-        }
-
-        System.out.println("----------------------------------");
-    }
 }
 
-class BookingThread extends Thread {
+class Booking {
+    int bookingId;
+    String roomType;
+    int roomsBooked;
 
-    Room room;
-    String user;
-    int roomsRequested;
-
-    BookingThread(Room room, String user, int roomsRequested) {
-        this.room = room;
-        this.user = user;
-        this.roomsRequested = roomsRequested;
-    }
-
-    public void run() {
-        room.bookRoom(user, roomsRequested);
+    Booking(int bookingId, String roomType, int roomsBooked) {
+        this.bookingId = bookingId;
+        this.roomType = roomType;
+        this.roomsBooked = roomsBooked;
     }
 }
 
 public class BookMyStayApp {
 
+    static final String FILE_NAME = "bookings.txt";
+
     public static void main(String[] args) {
 
-        Room room = new Room("Suite", 2);
+        ArrayList<Booking> bookings = loadBookings();
 
-        Thread user1 = new BookingThread(room, "User A", 2);
-        Thread user2 = new BookingThread(room, "User B", 2);
+        ArrayList<Room> rooms = new ArrayList<>();
+        rooms.add(new Room("Single Room", 5));
+        rooms.add(new Room("Double Room", 3));
+        rooms.add(new Room("Suite", 2));
 
-        user1.start();
-        user2.start();
+        Scanner sc = new Scanner(System.in);
+
+        int bookingCounter = bookings.size() + 1001;
+
+        System.out.print("Enter room type to book: ");
+        String type = sc.nextLine();
+
+        for (Room room : rooms) {
+
+            if (room.type.equalsIgnoreCase(type)) {
+
+                System.out.print("Enter number of rooms: ");
+                int num = sc.nextInt();
+
+                if (num <= room.availableRooms) {
+
+                    room.availableRooms -= num;
+
+                    Booking booking = new Booking(bookingCounter++, room.type, num);
+                    bookings.add(booking);
+
+                    saveBookings(bookings);
+
+                    System.out.println("Booking Confirmed ✅");
+                    System.out.println("Booking ID: " + booking.bookingId);
+                } else {
+                    System.out.println("Not enough rooms ❌");
+                }
+            }
+        }
+
+        System.out.println("\nRecovered Booking History:");
+
+        for (Booking b : bookings) {
+            System.out.println(b.bookingId + " | " + b.roomType + " | " + b.roomsBooked);
+        }
+
+        sc.close();
+    }
+
+    static void saveBookings(ArrayList<Booking> bookings) {
+        try {
+            FileWriter fw = new FileWriter(FILE_NAME);
+
+            for (Booking b : bookings) {
+                fw.write(b.bookingId + "," + b.roomType + "," + b.roomsBooked + "\n");
+            }
+
+            fw.close();
+
+        } catch (IOException e) {
+            System.out.println("Error saving data ❌");
+        }
+    }
+
+    static ArrayList<Booking> loadBookings() {
+        ArrayList<Booking> bookings = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(FILE_NAME));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+
+                int id = Integer.parseInt(data[0]);
+                String type = data[1];
+                int rooms = Integer.parseInt(data[2]);
+
+                bookings.add(new Booking(id, type, rooms));
+            }
+
+            br.close();
+
+        } catch (IOException e) {
+            System.out.println("No previous data found (fresh start)");
+        }
+
+        return bookings;
     }
 }
