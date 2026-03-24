@@ -19,7 +19,7 @@ public class BookMyStayApp {
 
         System.out.println("=================================");
         System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.3 ");
+        System.out.println(" Version: 1.4 ");
         System.out.println("=================================\n");
 
         ArrayList<Room> rooms = new ArrayList<>();
@@ -30,24 +30,31 @@ public class BookMyStayApp {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter room type to search: ");
+        System.out.print("Enter room type to book: ");
         String searchType = sc.nextLine();
 
         boolean found = false;
 
         for (Room room : rooms) {
+
             if (room.type.equalsIgnoreCase(searchType)) {
                 found = true;
 
                 System.out.println("\nRoom Found!");
-                System.out.println("Room Type: " + room.type);
-                System.out.println("Price: ₹" + room.price);
                 System.out.println("Available Rooms: " + room.availableRooms);
 
-                if (room.availableRooms > 0) {
-                    System.out.println("Status: Available ✅");
+                System.out.print("Enter number of rooms to book: ");
+                int requestedRooms = sc.nextInt();
+
+                if (requestedRooms <= room.availableRooms) {
+                    room.availableRooms -= requestedRooms;
+
+                    System.out.println("\nBooking Successful ✅");
+                    System.out.println("Rooms Booked: " + requestedRooms);
+                    System.out.println("Remaining Rooms: " + room.availableRooms);
                 } else {
-                    System.out.println("Status: Not Available ❌");
+                    System.out.println("\nBooking Failed ❌");
+                    System.out.println("Not enough rooms available");
                 }
             }
         }
