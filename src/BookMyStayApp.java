@@ -1,26 +1,38 @@
 import java.util.ArrayList;
 
+class Room {
+    String type;
+    double price;
+    int availableRooms;
+
+    Room(String type, double price, int availableRooms) {
+        this.type = type;
+        this.price = price;
+        this.availableRooms = availableRooms;
+    }
+}
+
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
         System.out.println("=================================");
         System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.1 ");
+        System.out.println(" Version: 1.2 ");
         System.out.println("=================================\n");
 
-        ArrayList<String> roomTypes = new ArrayList<>();
-        roomTypes.add("Single Room");
-        roomTypes.add("Double Room");
-        roomTypes.add("Suite");
+        ArrayList<Room> rooms = new ArrayList<>();
 
-        int[] availability = {5, 3, 2};
+        rooms.add(new Room("Single Room", 2000, 5));
+        rooms.add(new Room("Double Room", 3500, 3));
+        rooms.add(new Room("Suite", 5000, 2));
 
-        System.out.println("Available Room Types:\n");
+        System.out.println("Room Inventory:\n");
 
-        for (int i = 0; i < roomTypes.size(); i++) {
-            System.out.println("Room Type: " + roomTypes.get(i));
-            System.out.println("Available Rooms: " + availability[i]);
+        for (Room room : rooms) {
+            System.out.println("Room Type: " + room.type);
+            System.out.println("Price: ₹" + room.price);
+            System.out.println("Available Rooms: " + room.availableRooms);
             System.out.println("-----------------------------");
         }
     }
