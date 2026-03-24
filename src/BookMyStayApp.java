@@ -32,11 +32,6 @@ public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        System.out.println("=================================");
-        System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.7 ");
-        System.out.println("=================================\n");
-
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Booking> bookings = new ArrayList<>();
 
@@ -45,25 +40,39 @@ public class BookMyStayApp {
         rooms.add(new Room("Suite", 5000, 2));
 
         Scanner sc = new Scanner(System.in);
-
         int bookingCounter = 1001;
 
-        System.out.print("Enter room type to book: ");
-        String searchType = sc.nextLine();
+        try {
 
-        boolean found = false;
+            System.out.print("Enter room type to book: ");
+            String searchType = sc.nextLine();
 
-        for (Room room : rooms) {
+            boolean found = false;
 
-            if (room.type.equalsIgnoreCase(searchType)) {
-                found = true;
+            for (Room room : rooms) {
 
-                System.out.println("\nAvailable Rooms: " + room.availableRooms);
-                System.out.print("Enter number of rooms to book: ");
-                int requestedRooms = sc.nextInt();
-                sc.nextLine();
+                if (room.type.equalsIgnoreCase(searchType)) {
+                    found = true;
 
-                if (requestedRooms <= room.availableRooms) {
+                    System.out.println("Available Rooms: " + room.availableRooms);
+                    System.out.print("Enter number of rooms to book: ");
+
+                    if (!sc.hasNextInt()) {
+                        System.out.println("Invalid input ❌ (Enter numbers only)");
+                        return;
+                    }
+
+                    int requestedRooms = sc.nextInt();
+
+                    if (requestedRooms <= 0) {
+                        System.out.println("Invalid number of rooms ❌");
+                        return;
+                    }
+
+                    if (requestedRooms > room.availableRooms) {
+                        System.out.println("Not enough rooms available ❌");
+                        return;
+                    }
 
                     room.availableRooms -= requestedRooms;
 
@@ -71,11 +80,16 @@ public class BookMyStayApp {
 
                     double totalCost = requestedRooms * room.price;
 
-                    System.out.println("\nSelect Add-On Services:");
+                    System.out.println("Select Add-On Service:");
                     System.out.println("1. WiFi (₹500)");
                     System.out.println("2. Breakfast (₹800)");
                     System.out.println("3. Parking (₹300)");
-                    System.out.println("4. No Add-On");
+                    System.out.println("4. None");
+
+                    if (!sc.hasNextInt()) {
+                        System.out.println("Invalid service choice ❌");
+                        return;
+                    }
 
                     int choice = sc.nextInt();
 
@@ -92,42 +106,28 @@ public class BookMyStayApp {
                             booking.services.add("Parking");
                             totalCost += 300;
                             break;
-                        default:
+                        case 4:
                             break;
+                        default:
+                            System.out.println("Invalid choice ❌");
+                            return;
                     }
 
                     booking.totalCost = totalCost;
                     bookings.add(booking);
 
-                    System.out.println("\nBooking Confirmed ✅");
+                    System.out.println("Booking Confirmed ✅");
                     System.out.println("Booking ID: " + booking.bookingId);
-                } else {
-                    System.out.println("\nBooking Failed ❌");
                 }
             }
+
+            if (!found) {
+                System.out.println("Room type not found ❌");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Unexpected error occurred ❌");
         }
-
-        if (!found) {
-            System.out.println("\nRoom type not found ❌");
-        }
-
-        System.out.println("\n========== BOOKING HISTORY ==========");
-
-        double totalRevenue = 0;
-
-        for (Booking b : bookings) {
-            System.out.println("Booking ID: " + b.bookingId);
-            System.out.println("Room Type: " + b.roomType);
-            System.out.println("Rooms Booked: " + b.roomsBooked);
-            System.out.println("Services: " + b.services);
-            System.out.println("Total Cost: ₹" + b.totalCost);
-            System.out.println("-----------------------------");
-
-            totalRevenue += b.totalCost;
-        }
-
-        System.out.println("Total Bookings: " + bookings.size());
-        System.out.println("Total Revenue: ₹" + totalRevenue);
 
         sc.close();
     }
