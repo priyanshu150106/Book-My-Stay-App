@@ -17,11 +17,14 @@ class Booking {
     int bookingId;
     String roomType;
     int roomsBooked;
+    ArrayList<String> services;
+    double totalCost;
 
     Booking(int bookingId, String roomType, int roomsBooked) {
         this.bookingId = bookingId;
         this.roomType = roomType;
         this.roomsBooked = roomsBooked;
+        this.services = new ArrayList<>();
     }
 }
 
@@ -31,7 +34,7 @@ public class BookMyStayApp {
 
         System.out.println("=================================");
         System.out.println(" Welcome to Hotel Booking System ");
-        System.out.println(" Version: 1.5 ");
+        System.out.println(" Version: 1.6 ");
         System.out.println("=================================\n");
 
         ArrayList<Room> rooms = new ArrayList<>();
@@ -57,23 +60,50 @@ public class BookMyStayApp {
                 System.out.println("\nAvailable Rooms: " + room.availableRooms);
                 System.out.print("Enter number of rooms to book: ");
                 int requestedRooms = sc.nextInt();
+                sc.nextLine();
 
                 if (requestedRooms <= room.availableRooms) {
 
                     room.availableRooms -= requestedRooms;
 
-                    Booking booking = new Booking(
-                            bookingCounter,
-                            room.type,
-                            requestedRooms
-                    );
+                    Booking booking = new Booking(bookingCounter, room.type, requestedRooms);
 
+                    double totalCost = requestedRooms * room.price;
+
+                    System.out.println("\nSelect Add-On Services:");
+                    System.out.println("1. WiFi (₹500)");
+                    System.out.println("2. Breakfast (₹800)");
+                    System.out.println("3. Parking (₹300)");
+                    System.out.println("4. No Add-On");
+
+                    int choice = sc.nextInt();
+
+                    switch (choice) {
+                        case 1:
+                            booking.services.add("WiFi");
+                            totalCost += 500;
+                            break;
+                        case 2:
+                            booking.services.add("Breakfast");
+                            totalCost += 800;
+                            break;
+                        case 3:
+                            booking.services.add("Parking");
+                            totalCost += 300;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    booking.totalCost = totalCost;
                     bookings.add(booking);
 
                     System.out.println("\nBooking Confirmed ✅");
                     System.out.println("Booking ID: " + booking.bookingId);
                     System.out.println("Room Type: " + booking.roomType);
                     System.out.println("Rooms Booked: " + booking.roomsBooked);
+                    System.out.println("Services: " + booking.services);
+                    System.out.println("Total Cost: ₹" + booking.totalCost);
                 } else {
                     System.out.println("\nBooking Failed ❌");
                     System.out.println("Not enough rooms available");
