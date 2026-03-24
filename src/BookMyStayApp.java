@@ -1,30 +1,54 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 class Room {
     String type;
-    double price;
     int availableRooms;
 
-    Room(String type, double price, int availableRooms) {
+    Room(String type, int availableRooms) {
         this.type = type;
-        this.price = price;
         this.availableRooms = availableRooms;
+    }
+
+    synchronized void bookRoom(String user, int roomsRequested) {
+
+        System.out.println(user + " trying to book " + roomsRequested + " rooms");
+
+        if (roomsRequested <= availableRooms) {
+
+            System.out.println(user + " booking in progress...");
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println("Error");
+            }
+
+            availableRooms -= roomsRequested;
+
+            System.out.println(user + " booking successful ✅");
+            System.out.println("Remaining Rooms: " + availableRooms);
+        } else {
+            System.out.println(user + " booking failed ❌ (Not enough rooms)");
+        }
+
+        System.out.println("----------------------------------");
     }
 }
 
-class Booking {
-    int bookingId;
-    String roomType;
-    int roomsBooked;
-    ArrayList<String> services;
-    double totalCost;
+class BookingThread extends Thread {
 
-    Booking(int bookingId, String roomType, int roomsBooked) {
-        this.bookingId = bookingId;
-        this.roomType = roomType;
-        this.roomsBooked = roomsBooked;
-        this.services = new ArrayList<>();
+    Room room;
+    String user;
+    int roomsRequested;
+
+    BookingThread(Room room, String user, int roomsRequested) {
+        this.room = room;
+        this.user = user;
+        this.roomsRequested = roomsRequested;
+    }
+
+    public void run() {
+        room.bookRoom(user, roomsRequested);
     }
 }
 
@@ -32,68 +56,12 @@ public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        ArrayList<Room> rooms = new ArrayList<>();
-        ArrayList<Booking> bookings = new ArrayList<>();
+        Room room = new Room("Suite", 2);
 
-        rooms.add(new Room("Single Room", 2000, 5));
-        rooms.add(new Room("Double Room", 3500, 3));
-        rooms.add(new Room("Suite", 5000, 2));
+        Thread user1 = new BookingThread(room, "User A", 2);
+        Thread user2 = new BookingThread(room, "User B", 2);
 
-        Scanner sc = new Scanner(System.in);
-        int bookingCounter = 1001;
-
-        System.out.print("Enter room type to book: ");
-        String searchType = sc.nextLine();
-
-        for (Room room : rooms) {
-
-            if (room.type.equalsIgnoreCase(searchType)) {
-
-                System.out.print("Enter number of rooms: ");
-                int requestedRooms = sc.nextInt();
-
-                if (requestedRooms <= room.availableRooms) {
-
-                    room.availableRooms -= requestedRooms;
-
-                    Booking booking = new Booking(bookingCounter++, room.type, requestedRooms);
-                    bookings.add(booking);
-
-                    System.out.println("Booking Confirmed ✅");
-                    System.out.println("Booking ID: " + booking.bookingId);
-                }
-            }
-        }
-
-        System.out.print("\nEnter Booking ID to cancel: ");
-        int cancelId = sc.nextInt();
-
-        boolean cancelled = false;
-
-        for (int i = 0; i < bookings.size(); i++) {
-
-            Booking b = bookings.get(i);
-
-            if (b.bookingId == cancelId) {
-
-                for (Room room : rooms) {
-                    if (room.type.equalsIgnoreCase(b.roomType)) {
-                        room.availableRooms += b.roomsBooked;
-                    }
-                }
-
-                bookings.remove(i);
-                cancelled = true;
-
-                System.out.println("Booking Cancelled ✅");
-                break;
-            }
-        }
-
-        if (!cancelled) {
-            System.out.println("Invalid Booking ID ❌");
-        }
-
-        sc.close();
+        user1.start();
+        user2.start();
     }
 }
